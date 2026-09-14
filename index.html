@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚗 Controle de Oficina</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚗 Controle de Oficina</h1>
+            <p class="version">Versão: 02.00 • Criado por Oilton Rebelo</p>
+        </header>
+
+        <!-- Resumo por Oficina -->
+        <div id="workshopSummary" class="workshop-summary"></div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="vehicles">Veículos</button>
+            <button class="tab" data-tab="history">Histórico</button>
+        </div>
+
+        <div id="vehicles-tab" class="tab-content active">
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Todos</button>
+                <button class="filter-btn" data-filter="orcamento">Orçamento</button>
+                <button class="filter-btn" data-filter="aguardando-aprovacao">Aguardando Aprovação</button>
+                <button class="filter-btn" data-filter="aguardando-peca">Aguardando Peça</button>
+                <button class="filter-btn" data-filter="em-execucao">Em Execução</button>
+                <button class="filter-btn" data-filter="pronto">Pronto</button>
+            </div>
+
+            <button class="btn-add" id="openModal">+ Adicionar Manutenção</button>
+
+            <div id="vehiclesList" class="vehicles-list"></div>
+        </div>
+
+        <div id="history-tab" class="tab-content">
+            <div id="historyList" class="vehicles-list"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Adicionar Manutenção</h2>
+
+            <form id="maintenanceForm">
+                <input type="hidden" id="editIndex">
+
+                <div class="form-group">
+                    <label for="modelo">Modelo do Veículo *</label>
+                    <select id="modelo" required>
+                        <option value="">Selecione o modelo</option>
+                        <option value="Leve">Leve</option>
+                        <option value="Pick up Leve">Pick up Leve</option>
+                        <option value="Pick up Média">Pick up Média</option>
+                        <option value="Guindaste">Guindaste</option>
+                        <option value="Cesto">Cesto</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="placa">Placa *</label>
+                    <input type="text" id="placa" required placeholder="ABC-1234">
+                </div>
+
+                <div class="form-group">
+                    <label for="oficina">Oficina *</label>
+                    <input type="text" id="oficina" required placeholder="Nome da oficina">
+                </div>
+
+                <div class="form-group">
+                    <label for="numeroOS">Número da OS</label>
+                    <input type="text" id="numeroOS" placeholder="Número da ordem de serviço">
+                </div>
+
+                <div class="form-group">
+                    <label for="problema">Problema Relatado *</label>
+                    <textarea id="problema" required placeholder="Descreva o problema relatado pelo cliente..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="valorOrcamento">Valor do Orçamento</label>
+                    <input type="text" id="valorOrcamento" placeholder="R$ 0,00">
+                </div>
+
+                <div class="form-group">
+                    <label for="previsaoSaida">Previsão de Saída</label>
+                    <input type="date" id="previsaoSaida">
+                </div>
+
+                <div class="form-group">
+                    <label for="status">Status *</label>
+                    <select id="status" required>
+                        <option value="orcamento">Orçamento</option>
+                        <option value="aguardando-aprovacao">Aguardando Aprovação</option>
+                        <option value="aguardando-peca">Aguardando Peça</option>
+                        <option value="em-execucao">Em Execução</option>
+                        <option value="pronto">Pronto</option>
+                        <option value="entregue">Entregue</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-submit">Salvar Manutenção</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
