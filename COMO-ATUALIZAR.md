@@ -15,7 +15,7 @@ Abra o **Git Bash** na pasta "Nova pasta (2)" (botão direito → "Git Bash Here
 
 ```bash
 git add .
-git commit -m "Site completo de controle de oficina"
+git commit -m "Integrado Supabase - dados compartilhados entre todos"
 git push
 ```
 
@@ -47,14 +47,12 @@ git push
 
 ## 💾 IMPORTANTE: Dados dos Veículos
 
-⚠️ **Os dados ficam salvos no navegador de cada pessoa** (localStorage).
+✅ **Os dados agora estão no Supabase!**
 
 Isso significa que:
-- Cada pessoa que acessar terá sua própria lista
-- Os dados NÃO são compartilhados entre usuários
-- Para compartilhar dados entre todos, seria necessário um banco de dados (Firebase, Supabase, etc.)
-
-Se quiser que TODOS vejam os mesmos veículos, me avise que eu crio uma versão com banco de dados!
+- **TODOS que acessarem o site verão os MESMOS veículos**
+- Os dados são compartilhados entre todos os usuários
+- Tudo fica salvo na nuvem, mesmo se fechar o navegador
 
 ---
 

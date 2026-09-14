@@ -1,5 +1,102 @@
-// Dados dos veículos (simulando localStorage para deploy estático)
-let vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+// Configuração do Supabase
+const SUPABASE_URL = 'https://zxutjfknblwozwuzzoxj.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_Id6DFwyts6XvdS07L5Sbxw_l160HMJ8';
+
+let vehicles = [];
+
+// Limpar localStorage antigo (migração para Supabase)
+if (localStorage.getItem('vehicles')) {
+    localStorage.removeItem('vehicles');
+    console.log('localStorage antigo removido - agora usando Supabase');
+}
+
+// Funções do Supabase
+async function loadVehicles() {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/vehicles?select=*&order=created_at.desc`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+
+        if (response.ok) {
+            vehicles = await response.json();
+            renderVehicles();
+        }
+    } catch (error) {
+        console.error('Erro ao carregar veículos:', error);
+        alert('Erro ao carregar dados. Verifique sua conexão.');
+    }
+}
+
+async function saveVehicle(vehicle) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/vehicles`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(vehicle)
+        });
+
+        if (response.ok) {
+            await loadVehicles();
+        } else {
+            throw new Error('Erro ao salvar');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar veículo:', error);
+        alert('Erro ao salvar. Tente novamente.');
+    }
+}
+
+async function updateVehicle(id, vehicle) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/vehicles?id=eq.${id}`, {
+            method: 'PATCH',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(vehicle)
+        });
+
+        if (response.ok) {
+            await loadVehicles();
+        } else {
+            throw new Error('Erro ao atualizar');
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar veículo:', error);
+        alert('Erro ao atualizar. Tente novamente.');
+    }
+}
+
+async function deleteVehicle(id) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/vehicles?id=eq.${id}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+
+        if (response.ok) {
+            await loadVehicles();
+        } else {
+            throw new Error('Erro ao excluir');
+        }
+    } catch (error) {
+        console.error('Erro ao excluir veículo:', error);
+        alert('Erro ao excluir. Tente novamente.');
+    }
+}
 
 // Elementos do DOM
 const modal = document.getElementById('modal');
@@ -73,11 +170,10 @@ document.getElementById('valorOrcamento').addEventListener('input', (e) => {
 });
 
 // Submissão do formulário
-maintenanceForm.addEventListener('submit', (e) => {
+maintenanceForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const vehicle = {
-        id: Date.now(),
         modelo: document.getElementById('modelo').value,
         placa: document.getElementById('placa').value.toUpperCase(),
         oficina: document.getElementById('oficina').value,
@@ -85,29 +181,27 @@ maintenanceForm.addEventListener('submit', (e) => {
         problema: document.getElementById('problema').value,
         valorOrcamento: document.getElementById('valorOrcamento').value,
         previsaoSaida: document.getElementById('previsaoSaida').value,
-        status: document.getElementById('status').value,
-        dataRegistro: new Date().toISOString()
+        status: document.getElementById('status').value
     };
 
     const editIndex = document.getElementById('editIndex').value;
 
     if (editIndex !== '') {
         // Editar veículo existente
-        vehicles[editIndex] = { ...vehicles[editIndex], ...vehicle, id: vehicles[editIndex].id };
+        const vehicleId = vehicles[editIndex].id;
+        await updateVehicle(vehicleId, vehicle);
     } else {
         // Adicionar novo veículo
-        vehicles.push(vehicle);
+        await saveVehicle(vehicle);
     }
 
-    saveVehicles();
     modal.style.display = 'none';
     maintenanceForm.reset();
-    renderVehicles();
 });
 
 // Salvar no localStorage
 function saveVehicles() {
-    localStorage.setItem('vehicles', JSON.stringify(vehicles));
+    // Função removida - agora usamos Supabase
 }
 
 // Renderizar resumo por oficina
@@ -245,11 +339,11 @@ function createVehicleCard(vehicle, index, isHistory = false) {
             ${!isHistory ? `
             <div class="vehicle-actions">
                 <button class="btn-action btn-edit" onclick="editVehicle(${index})">Editar</button>
-                <button class="btn-action btn-delete" onclick="deleteVehicle(${index})">Excluir</button>
+                <button class="btn-action btn-delete" onclick="deleteVehicleHandler(${index})">Excluir</button>
             </div>
             ` : `
             <div class="vehicle-actions">
-                <button class="btn-action btn-delete" onclick="deleteVehicle(${index})">Excluir</button>
+                <button class="btn-action btn-delete" onclick="deleteVehicleHandler(${index})">Excluir</button>
             </div>
             `}
         </div>
@@ -275,13 +369,12 @@ function editVehicle(index) {
 }
 
 // Excluir veículo
-function deleteVehicle(index) {
+async function deleteVehicleHandler(index) {
     if (confirm('Tem certeza que deseja excluir este veículo?')) {
-        vehicles.splice(index, 1);
-        saveVehicles();
-        renderVehicles();
+        const vehicleId = vehicles[index].id;
+        await deleteVehicle(vehicleId);
     }
 }
 
 // Inicialização
-renderVehicles();
+loadVehicles();
